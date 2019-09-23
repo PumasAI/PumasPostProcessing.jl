@@ -12,3 +12,8 @@ julia> cd("path/to/this/project")
 pkg> activate .
 pkg> instantiate
 ```
+## Project Strucutre 
+
+
+![project structure](/assets/projectstructure.png)
+
