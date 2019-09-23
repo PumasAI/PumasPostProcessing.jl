@@ -1,3 +1,5 @@
 name = "PKModel"
+
 [deps]
 DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
+Pumas = "4f2c3c20-a4ac-11e9-067b-e5872d3484cf"
