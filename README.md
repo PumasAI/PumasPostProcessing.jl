@@ -1,5 +1,4 @@
-# DemoPKModelProject
-A Simple PK model demo project.
+# PumasPostProcessing
 
 In use to build out Post-Processing functions. 
 
