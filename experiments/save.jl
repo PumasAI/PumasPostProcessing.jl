@@ -1,18 +1,14 @@
 using Pumas, FileIO, BSON, JLD2, Serialization, HDF5, Feather
 
-@noinline function f(x)
-    return x + 1
-end
+f = x -> x+1
 
-function g(x)
-    return f(x) - 1
-end
+g = x -> f(x) + 1
 
 serialize("f.jls", f)
 serialize("g.jls", g)
 
-@code_llvm deserialize("f.jls")(1)
-@code_llvm deserialize("g.jls")(1)
+f1 = deserialize("f.jls")
+g1 = deserialize("g.jls")
 
 @save "f.jld2" f
 
