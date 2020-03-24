@@ -35,14 +35,50 @@ function paramtable(
     pushfirst!(rows, ["Parameter", "Estimate", "RSE", "95% confidence interval"])
 
     # Materialize a Markdown table, and return it as an MD node.
-    return Markdown.Table(rows, align) |> Markdown.MD
+    return Markdown.MD(Markdown.Table(rows, align))
 end
 
 paramtable(fpm::Pumas.FittedPumasModel; kwargs...) = paramtable(infer(fpm); kwargs...)
 
-function report_optim_meta(res::Pumas.FittedPumasModel)
+function optim_meta(res::Pumas.FittedPumasModel)
     return (iterations = res.optim.iterations, time_run = res.optim.time_run, ofv = res.optim.minimum)
 end
+
+function optim_meta_table(res::FittedPumasModel; align = [:l, :c])
+    iterations, time_run, ofv = optim_meta(res)
+    return Markdown.MD(
+        Markdown.Table(
+                [
+                ["Iterations", iterations],
+                ["Time run", time_run],
+                ["Objective function value", ofv],
+            ],
+            align
+        )
+    )
+end
+
+function embed(plot::Plots.Plot)
+    path = "fig-$(gensym()).png" # TODO a more sensible figure path when integrated
+    Plots.savefig(plot, path)
+    return Markdown.Image(path, "Figure")
+end
+
+function to_report_str(fpm::FittedPumasModel)
+    return """
+    # Model Report
+
+    ## Parameter Table
+    $(paramtable(fpm))
+
+    ## Optimization Metadata
+    $(optim_meta_table(fpm))
+
+    $(embed(convergence(fpm)))
+    """
+end
+
+write("report.md", to_report_str(res))
 
 # TODO:
 # - Deviance
