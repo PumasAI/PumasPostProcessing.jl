@@ -1,11 +1,11 @@
-using Markdown, Showoff
+using Markdown
 
 mdpath = "render.md"
 
 res = res
 
 # Parameter estimate table
-function paramtable(
+function param_table(
         inference::Pumas.FittedPumasModelInference;
         ignores = Symbol[],
         align = [:c, :l, :l, :l]
@@ -29,7 +29,7 @@ function paramtable(
         Pumas._push_varinfo!(paramnames, paramvals, paramrse, paramconfint, paramname, paramval, std, quant)
     end
 
-    rows = zip(paramnames, paramvals, paramrse, paramconfint) .|> x -> [x...]
+    rows = zip(paramnames, round.(paramvals; sigdigits=5), round.(paramrse; sigdigits=5), paramconfint) .|> x -> [x...]
 
     # Push the headers
     pushfirst!(rows, ["Parameter", "Estimate", "RSE", "95% confidence interval"])
@@ -38,17 +38,18 @@ function paramtable(
     return Markdown.MD(Markdown.Table(rows, align))
 end
 
-paramtable(fpm::Pumas.FittedPumasModel; kwargs...) = paramtable(infer(fpm); kwargs...)
+param_table(fpm::Pumas.FittedPumasModel; kwargs...) = paramtable(infer(fpm); kwargs...)
 
 function optim_meta(res::Pumas.FittedPumasModel)
     return (iterations = res.optim.iterations, time_run = res.optim.time_run, ofv = res.optim.minimum)
 end
 
-function optim_meta_table(res::FittedPumasModel; align = [:l, :c])
+function optim_meta_table(res::Pumas.FittedPumasModel; align = [:l, :c])
     iterations, time_run, ofv = optim_meta(res)
     return Markdown.MD(
         Markdown.Table(
                 [
+                ["Parameter", "Value"],
                 ["Iterations", iterations],
                 ["Time run", time_run],
                 ["Objective function value", ofv],
@@ -61,15 +62,15 @@ end
 function embed(plot::Plots.Plot)
     path = "fig-$(gensym()).png" # TODO a more sensible figure path when integrated
     Plots.savefig(plot, path)
-    return Markdown.Image(path, "Figure")
+    return "![Figure]($path)"
 end
 
-function to_report_str(fpm::FittedPumasModel)
+function to_report_str(fpm::Pumas.FittedPumasModel)
     return """
     # Model Report
 
     ## Parameter Table
-    $(paramtable(fpm))
+    $(param_table(fpm))
 
     ## Optimization Metadata
     $(optim_meta_table(fpm))
