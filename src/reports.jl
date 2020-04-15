@@ -1,10 +1,9 @@
 using Markdown
-
-mdpath = "render.md"
-
-res = res
-
+using Pumas
+using Pumas: FittedPumasModel
+using PumasPlots
 # Parameter estimate table
+
 """
     param_table(
         inf::FittedPumasModel[Inference];
@@ -167,27 +166,15 @@ function embed(
     """
 end
 
+
 function to_report_str(fpm::Pumas.FittedPumasModel; plotsdir = ".")
-    individual_wres = plot_grouped(groupby(DataFrame(inspect(fpm)), :id); legend = :none, ) do subdf
-                        @df subdf scatter(:time, :dv_wres; legend = :none)
-                    end
-    individual_dv = plot_grouped(groupby(DataFrame(inspect(res)), :id); legend = :none, xlabel = "time", ylabel = "dv") do subdf
-       @df subdf plot(:time, :dv)
-       end
     return """
     # Model Report
 
     ## Parameter Table
     $(param_table(
         fpm;
-        descriptions = [
-            "Time varying chlorate",
-            "Time varying voltage",
-            "Evening chloroform",
-            "Omega number 1",
-            "Omega version 2: the cooler one",
-            "Standard deviation from propriety"
-        ]
+        descriptions = [...]
     ))
 
     ## Model Metrics
@@ -198,48 +185,54 @@ function to_report_str(fpm::Pumas.FittedPumasModel; plotsdir = ".")
 
     \\newpage
 
-    $(embed(etacov(fpm; catmap = (isPM = true, wt = true)); dir = ".", name = "Empirical Bayes covariate estimates"))
+    $(embed(etacov(fpm; catmap = (isPM = true, wt = true)); dir = plotsdir, name = "Empirical Bayes covariate estimates"))
 
     \\newpage
 
     $(embed(
         resplot(fpm; catmap = (isPM = true, wt = true));
-        dir = ".",
+        dir = plotsdir,
         name = "Residuals of covariates",
         head_level = 2,
         caption = "Residuals versus categorical covariates in the model."
-    ))
-
-    \\newpage
-
-    $(embed(
-        individual_wres;
-        dir = ".",
-        name = "Per-subject weighted residuals",
-        caption = "Continuous weighted residuals plotted against time for individual subjects."
-    ))
-
-    \\newpage
-
-    $(embed(
-        individual_dv;
-        dir = ".",
-        name = "Dependent variable per subject",
-        caption = "Dependent variable plotted against time for individual subjects."
-    ))
+    )
+    )
     """
 end
 
-write("report.md", to_report_str(res))
 
-run(`
-    pandoc
-        --pdf-engine=xelatex
-        -V 'mainfont=DejaVu Sans'
-        -V 'geometry:margin=1in'
-        report.md
-        -o report.pdf
-`)
+function report_to_pdf(filename::String, report::String)
+    pandoc = open(`
+        pandoc
+            --pdf-engine=xelatex
+            -V 'mainfont=DejaVu Sans'
+            -V 'geometry:margin=1in'
+            -o report.pdf
+    `, "w")
+
+    print(pandoc.in, report)
+
+    close(pandoc.in)
+
+    success(pandoc)
+
+    return filename
+end
+
+function report_to_md(filename::String, report::String)
+    open(filename, "w") do f
+        print(f, report)
+    end
+    return filename
+end
+
+str = generate_my_report(fpm)
+report_to_pdf("model001.pdf", str)
+
+
+# write("report.md", to_report_str(res))
+#
+
 
 # TODO:
 # - Deviance
