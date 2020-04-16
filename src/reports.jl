@@ -88,19 +88,36 @@ Outputs a table containing basic optimization metadata - the number of iteration
 
 An example table looks like this:
 ```
-Metric                          Value
-–––––––––––––––––––––––– –––––––––––––––––––
-Iterations                       12
-Time run                 0.37180399894714355
-Objective function value  8464.875537914886
+Metric                                     Value
+––––––––––––––––––––––––––––––––––– –––––––––––––––––––
+Successful minimization                    true
+Likelihood approximation                Pumas.FOCEI
+Deviance                                 14234.502
+Total number of observation records        1210
+Number of actve observation records        1210
+Number of subjects                          10
+Iterations                                  10
+Time run                            0.29492616653442383
+Objective function value             8229.16686381138  
 ```
 """
 function optim_meta_table(fpm::Pumas.FittedPumasModel; align = [:l, :c])
     iterations, time_run, ofv = optim_meta(fpm)
+    approx = typeof(fpm.approx)
+    deviance = round(Pumas.deviance(fpm); sigdigits=round(Int, -log10(Pumas.DEFAULT_ESTIMATION_RELTOL)))
+    total_records = sum((length(sub.time) for sub in fpm.data))
+    active_records = sum(subject -> sum(name -> count(!ismissing, subject.observations[name]), keys(first(fpm.data).observations)), fpm.data)
+
     return Markdown.MD(
         Markdown.Table(
                 [
                 ["Metric", "Value"],
+                ["Successful minimization", Pumas.Optim.converged(fpm.optim)],
+                ["Likelihood approximation", approx],
+                ["Deviance", deviance],
+                ["Total number of observation records", total_records],
+                ["Number of actve observation records", active_records],
+                ["Number of subjects", length(fpm.data)],
                 ["Iterations", iterations],
                 ["Time run", time_run],
                 ["Objective function value", ofv],
@@ -174,7 +191,6 @@ function to_report_str(fpm::Pumas.FittedPumasModel; plotsdir = ".")
     ## Parameter Table
     $(param_table(
         fpm;
-        descriptions = [...]
     ))
 
     ## Model Metrics
@@ -225,9 +241,6 @@ function report_to_md(filename::String, report::String)
     end
     return filename
 end
-
-str = generate_my_report(fpm)
-report_to_pdf("model001.pdf", str)
 
 
 # write("report.md", to_report_str(res))
