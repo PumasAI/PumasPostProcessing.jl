@@ -25,7 +25,7 @@ function jmd_report(
     thl = TABLE_HEADER_LEVEL[]
     phl = PLOT_HEADER_LEVEL[]
 
-    df = DataFrame(inspect(res))
+    df = DataFrame(inspect(fpm))
 
     println(io, DEFAULT_REPORT_HEADER[] * "\n\n")
 
