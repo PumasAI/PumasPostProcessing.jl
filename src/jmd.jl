@@ -31,8 +31,9 @@ function jmd_report(
 
     printlnln(io, JLC("""
         # setup for the notebook
+        using Pumas, PumasPlots
         using Serialization
-        fpm = Serialization.deserialize(path_to_artifact(name, number))
+        fpm = Serialization.deserialize(path_to_artifact($name, $number))
         formatter = $(DEFAULT_FORMATTER[])
         Plots.default(legendpos = :outerright)
         """

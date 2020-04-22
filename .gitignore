@@ -3,3 +3,10 @@
 *.jl.mem
 deps/deps.jl
 .DS_Store
+
+*.pdf
+*.jld2
+*.jls
+*.png
+
+Manifest.toml

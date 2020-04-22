@@ -9,6 +9,6 @@ PumasPlots = "0c61e9cd-e02e-46f2-b961-0746d5a16e3b"
 Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
 [compat]
-PrettyTables = "1"
+PrettyTables = "0.8, 0.9"
 PumasPlots = "0.1"
 Pumas = "0.11"

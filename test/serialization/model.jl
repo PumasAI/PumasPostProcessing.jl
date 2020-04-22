@@ -1,3 +1,5 @@
-serialize("res.jls", res)
+using Serialization
+serialize("serialized/model.jls", model)
+serialize("serialized/fpm.jls", res)
 
-@test success(`$(Base.julia_cmd()) -e 'using Pumas, Serialization; res = deserialize("res.jls"); @show res'`) # this can take a while
+@test success(`$(Base.julia_cmd()) -e 'using Pumas, Serialization; @show(deserialize("serialized/model.jls")); @show(deserialize("serialized/fpm.jls"));'`)
