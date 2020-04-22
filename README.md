@@ -1,13 +1,33 @@
 # PumasPostProcessing
 
-In use to build out Post-Processing functions. 
+In use to build out Post-Processing functions.
 
 ## Setup
 
-Setup of this project is simple! Follow the instructions below:
+This package is available through the JuliaPro registry, and can be added in JuliaPro by `]add PumasPostProcessing`.
+
+## Usage
+
+PumasPostProcessing exposes two APIs - a low level, table generating API and a high-level report generating API.
+
+To use the automated report generation, you can call the exported `to_report_str` function, which will take in a `FittedPumasModel` and return a Markdown string which can be written to a file.  If you have [`pandoc`](pandoc.org) installed, there is also a `report_to_pdf` function, which will automatically create a PDF of the report through LaTeX.
 
 ```julia
-julia> cd("path/to/this/project")
-pkg> activate .
-pkg> instantiate
+# fpm isa FittedPumasModel
+report = to_report_str(fpm)
+write("report.md", report)
+report_to_pdf("report.pdf", report)
 ```
+
+There is also experimental Weave output, which will return a `.jmd` file for ease of customization.
+
+```julia
+write("report.jmd", PumasPostProcessing.jmd_report(fpm, "My Model", "1"))
+```
+
+The low-level API consists of functions which take in an FPM, and return tables.  These are in the functions
+`param_table`, `optim_meta_table`, and `metric_table`, which are all exported.  They are also documented, and you can view their docstrings in the REPL or JuliaPro documentation browser.
+
+## Feature requests and bug reports
+
+Please file any feature requests or bug reports you have as issues on this repo.
