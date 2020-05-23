@@ -83,7 +83,7 @@ function jmd_report(
     catmap = collect(pairs(merge(calculated_catmap, catmap)))
 
     categorical_cvs = first.(catmap[last.(catmap)])
-    continuous_cvs = first.(catmap[.!(last.(catmap))])
+    continuous_cvs  = first.(catmap[.!(last.(catmap))])
 
 
     # First, we can plot a few basic things, which don't require grouping.
@@ -93,9 +93,10 @@ function jmd_report(
     printlnln(io, MD(Header{phl}("DV v/s. IPRED")))
 
     printlnln(io, JLC("""
-    @df fpm scatter(:dv, :dv_ipred)
+    @df fpm scatter(:dv, :dv_ipred; xlabel = "dv", ylabel = "dv_ipred")
     Plots.abline!(1, 0; label = "LOI")
     @df fpm plot!(:dv, :dv_ipred; seriestype = :loess)
+
     """))
     printlnln(io, "\\newpage")
 
@@ -104,7 +105,7 @@ function jmd_report(
     printlnln(io, MD(Header{phl}("DV v/s. PRED")))
 
     printlnln(io, JLC("""
-    @df fpm scatter(:dv, :dv_pred)
+    @df fpm scatter(:dv, :dv_pred; xlabel = "dv", ylabel = "dv_pred")
     Plots.abline!(1, 0; label = "LOI")
     @df fpm plot!(:dv, :dv_pred; seriestype = :loess)
     """))
@@ -116,7 +117,7 @@ function jmd_report(
     printlnln(io, MD(Header{phl}("CWRES v/s. time")))
 
     printlnln(io, JLC("""
-    @df fpm scatter(:tad, :dv_wres)
+    @df fpm scatter(:tad, :dv_wres; xlabel = "Time after dose", ylabel = "Weighted residuals")
     Plots.hline!([0]; primary = false, linestyle = :dash, linecolor = :grey)
     """))
     printlnln(io, "\\newpage")
@@ -160,7 +161,6 @@ function jmd_report(
         end
     end
 
-    # Now,
 
 
     return String(take!(io))
