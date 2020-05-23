@@ -5,6 +5,7 @@ using PumasPlots.StatsPlots
 
 using Pumas: FittedPumasModel, StatsBase
 
+include("utils.jl")
 include("reports.jl")
 include("jmd.jl")
 
