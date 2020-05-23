@@ -10,5 +10,5 @@ Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
 [compat]
 PrettyTables = "0.8, 0.9"
+Pumas = "0.12"
 PumasPlots = "0.1"
-Pumas = "0.11"
