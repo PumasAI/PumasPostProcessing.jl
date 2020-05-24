@@ -45,9 +45,9 @@ function jmd_report(
         # setup for the notebook
         using Pumas, PumasPlots, PumasPostProcessing
         using Plots, StatsPlots
-        # using Serialization
-        # fpm = Serialization.deserialize(path_to_artifact($name, $number))
-        fpm = Main.res # TODO FIXME
+        using Serialization
+        fpm = Serialization.deserialize("$serialization_loc")
+        # fpm = Main.fpm # TODO FIXME
         formatter = $(DEFAULT_FORMATTER[])
         Plots.default(legend = :outerright, fmt = :pdf)
         """
