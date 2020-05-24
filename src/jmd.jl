@@ -83,6 +83,49 @@ function jmd_report(
     # Additionally, we have to split some plots up; for example, covariates
     # need to be split into categorical (boxplots) and continuous (scatters).
 
+    # First, we find (and plot) the dependent variables.
+    # To do this, we must know what the dependent variables are
+    # which can be found by looking at the subjects.
+    dv_keys = keys(first(fpm.data).observations)
+
+    for dv in dv_keys
+
+        printlnln(io, MD(Header{phl}("Dependent variable `$(dv)`")))
+
+        # Plot a basic DV v/s IPRED.
+        printlnln(io, MD(Header{phl + 1}("`$(dv)` v/s. IPRED")))
+
+        printlnln(io, JLC("""
+        @df fpm scatter(:$(dv), :$(dv)_ipred; xlabel = "$(dv)", ylabel = "$(dv)_ipred")
+        Plots.abline!(1, 0; label = "LOI")
+        @df fpm plot!(:$(dv), :$(dv)_ipred; seriestype = :loess)
+
+        """))
+        printlnln(io, "\\newpage")
+
+        # Plot a basic DV v/s PRED.
+
+        printlnln(io, MD(Header{phl + 1}("`$(dv)` v/s. PRED")))
+
+        printlnln(io, JLC("""
+        @df fpm scatter(:$(dv), :$(dv)_pred; xlabel = "$(dv)", ylabel = "$(dv)_pred")
+        Plots.abline!(1, 0; label = "LOI")
+        @df fpm plot!(:$(dv), :$(dv)_pred; seriestype = :loess)
+        """))
+        printlnln(io, "\\newpage")
+
+
+        # Plot conditional weighted residuals v/s time.
+
+        printlnln(io, MD(Header{phl + 1}("CWRES of `$(dv)` v/s. time")))
+
+        printlnln(io, JLC("""
+        @df fpm scatter(:tad, :$(dv)_wres; xlabel = "Time after dose", ylabel = "Weighted residuals")
+        Plots.hline!([0]; primary = false, linestyle = :dash, linecolor = :grey)
+        """))
+        printlnln(io, "\\newpage")
+    end
+
     # To do this splitting for the EBEs, we first need their keys:
     df_names = string.(names(df))
     ebe_keys = (x -> x[4:end]).(df_names[findall(x -> startswith(x, "η_"), df_names)])
@@ -100,38 +143,6 @@ function jmd_report(
     # First, we can plot a few basic things, which don't require grouping.
 
 
-    # Plot a basic DV v/s IPRED.
-    printlnln(io, MD(Header{phl}("DV v/s. IPRED")))
-
-    printlnln(io, JLC("""
-    @df fpm scatter(:dv, :dv_ipred; xlabel = "dv", ylabel = "dv_ipred")
-    Plots.abline!(1, 0; label = "LOI")
-    @df fpm plot!(:dv, :dv_ipred; seriestype = :loess)
-
-    """))
-    printlnln(io, "\\newpage")
-
-    # Plot a basic DV v/s PRED.
-
-    printlnln(io, MD(Header{phl}("DV v/s. PRED")))
-
-    printlnln(io, JLC("""
-    @df fpm scatter(:dv, :dv_pred; xlabel = "dv", ylabel = "dv_pred")
-    Plots.abline!(1, 0; label = "LOI")
-    @df fpm plot!(:dv, :dv_pred; seriestype = :loess)
-    """))
-    printlnln(io, "\\newpage")
-
-
-    # Plot conditional weighted residuals v/s time.
-
-    printlnln(io, MD(Header{phl}("CWRES v/s. time")))
-
-    printlnln(io, JLC("""
-    @df fpm scatter(:tad, :dv_wres; xlabel = "Time after dose", ylabel = "Weighted residuals")
-    Plots.hline!([0]; primary = false, linestyle = :dash, linecolor = :grey)
-    """))
-    printlnln(io, "\\newpage")
 
     # Now, for the adaptive plots.
     # We begin with etacov, on all covariates.
