@@ -16,10 +16,21 @@ end
 
 function jmd_report(
     fpm::Pumas.FittedPumasModel, name, number;
+    fpm_path = "data/serialized/fitted_models/",
     descriptions = [],
     catmap = NamedTuple(),
     kwargs...
     )
+
+    serialization_loc = joinpath(fpm_path, "$(name)_$(number).jls")
+    mkpath(dirname(serialization_loc))
+    if isfile(serialization_loc)
+        @warn "A file at $serialization_loc already exists!  Overwriting..."
+    else
+        @info "Writing fitted Pumas model to $serialization_loc"
+    end
+
+    Serialization.serialize(serialization_loc, fpm)
 
     io = IOBuffer()
 
