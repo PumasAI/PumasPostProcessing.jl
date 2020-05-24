@@ -14,6 +14,27 @@ function printlnln(io::IO, args...)
     return
 end
 
+"Get the keys of the EBEs from the inference"
+function ebe_names(ins)
+    ebes = ins.ebes.ebes
+    ebe_keys = keys(first(ebes))
+    ebe_types = map(typeof, first(ebes))
+
+    ret = Symbol[]
+    for k ∈ ebe_keys
+        ebe_type = ebe_types[k]
+        if ebe_type <: Number
+            push!(ret, Symbol(k))
+        elseif ebe_type <: AbstractVector
+            for j = 1:length(first(ebes)[k])
+                push!(ret, Symbol(string(k), "_$j"))
+            end
+        end
+    end
+
+    return ret
+end
+
 function jmd_report(
     fpm::Pumas.FittedPumasModel, name, number;
     fpm_path = "data/serialized/fitted_models/",
@@ -127,9 +148,7 @@ function jmd_report(
     end
 
     # To do this splitting for the EBEs, we first need their keys:
-    df_names = string.(names(df))
-    ebe_keys = (x -> x[4:end]).(df_names[findall(x -> startswith(x, "η_"), df_names)])
-
+    ebe_keys = ebe_names(inspect(fpm))
 
     cv_keys = PumasPlots.covariate_names(fpm)
 
@@ -208,5 +227,3 @@ function jmd_report(
     return String(take!(io))
 
 end
-
-|
