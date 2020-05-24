@@ -183,8 +183,30 @@ function jmd_report(
         end
     end
 
+    # Now, we will go for individual plots
+    printlnln(io, MD(Header{phl}("Individual plots")))
 
+    printlnln(io, JLC("""
+    individual_df = groupby(DataFrame(inspect(fpm)), :id);
+    individuals   = keys(individual_df);
+    """))
+    printlnln(io, "\\newpage")
+
+    population_grouped_df = groupby(df, :id)
+
+    for individual_set in paginate(eachindex(keys(population_grouped_df)))
+        printlnln(io, JLC("""
+        plot_grouped(individual_df[$(individual_set)]) do subdf
+            @df subdf plot(:time, :dv_pred; legend = :none, xlabel = "time")
+            @df subdf scatter!(:time, :dv_ipred)
+            @df subdf plot!(:time, :dv_ipred; seriestype = :Loess)
+        end
+        """))
+        printlnln(io, "\\newpage")
+    end
 
     return String(take!(io))
 
 end
+
+|
