@@ -15,8 +15,8 @@ function printlnln(io::IO, args...)
 end
 
 "Get the keys of the EBEs from the inference"
-function ebe_names(ins)
-    ebes = ins.ebes.ebes
+function ebe_names(fpm)
+    ebes = empirical_bayes(fpm)
     ebe_keys = keys(first(ebes))
     ebe_types = map(typeof, first(ebes))
 
@@ -111,7 +111,7 @@ function jmd_report(
 
     for dv in dv_keys
 
-        printlnln(io, MD(Header{phl}("Dependent variable `$(dv)`")))
+        printlnln(io, MD(Header{phl}("Individual plots for dependent variable `$(dv)`")))
 
         # Plot a basic DV v/s IPRED.
         printlnln(io, MD(Header{phl + 1}("`$(dv)` v/s. IPRED")))
@@ -120,7 +120,6 @@ function jmd_report(
         @df fpm scatter(:$(dv), :$(dv)_ipred; xlabel = "$(dv)", ylabel = "$(dv)_ipred")
         Plots.abline!(1, 0; label = "LOI")
         @df fpm plot!(:$(dv), :$(dv)_ipred; seriestype = :loess)
-
         """))
         printlnln(io, "\\newpage")
 
@@ -142,13 +141,14 @@ function jmd_report(
 
         printlnln(io, JLC("""
         @df fpm scatter(:tad, :$(dv)_wres; xlabel = "Time after dose", ylabel = "Weighted residuals")
+        @df fpm plot!(:tad, :$(dv)_wres; seriestype = :loess)
         Plots.hline!([0]; primary = false, linestyle = :dash, linecolor = :grey)
         """))
         printlnln(io, "\\newpage")
     end
 
     # To do this splitting for the EBEs, we first need their keys:
-    ebe_keys = ebe_names(inspect(fpm))
+    ebe_keys = ebe_names(fpm)
 
     cv_keys = PumasPlots.covariate_names(fpm)
 
@@ -212,16 +212,18 @@ function jmd_report(
     printlnln(io, "\\newpage")
 
     population_grouped_df = groupby(df, :id)
-
-    for individual_set in paginate(eachindex(keys(population_grouped_df)))
-        printlnln(io, JLC("""
-        plot_grouped(individual_df[$(individual_set)]) do subdf
-            @df subdf plot(:time, :dv_pred; legend = :none, xlabel = "time")
-            @df subdf scatter!(:time, :dv_ipred)
-            @df subdf plot!(:time, :dv_ipred; seriestype = :Loess)
+    for dv in dv_keys
+        printlnln(io, MD(Header{phl + 1}("Dependent variable $(dv)")))
+        for individual_set in paginate(eachindex(keys(population_grouped_df)))
+            printlnln(io, JLC("""
+            plot_grouped(individual_df[$(individual_set)]) do subdf
+                @df subdf plot(:time, :$(dv)_pred; legend = :none, xlabel = "time", ylabel = "$(dv)")
+                @df subdf scatter!(:time, :$(dv)_ipred)
+                @df subdf plot!(:time, :$(dv)_ipred; seriestype = :Loess)
+            end
+            """))
+            printlnln(io, "\\newpage")
         end
-        """))
-        printlnln(io, "\\newpage")
     end
 
     return String(take!(io))
