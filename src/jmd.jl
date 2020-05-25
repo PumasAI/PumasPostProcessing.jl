@@ -176,7 +176,7 @@ function jmd_report(
             printlnln(io, JLC("""
             etacov(
                 fpm;
-                etas = [$ebe_name],
+                etas = [:$ebe_name],
                 cvs = $keyset,
                 catmap = $((; zip(keyset, falses(length(keyset)))...)),
                 legend = :none,
@@ -192,7 +192,7 @@ function jmd_report(
             printlnln(io, JLC("""
             etacov(
                 fpm;
-                etas = [$ebe_name],
+                etas = [:$ebe_name],
                 cvs = $keyset,
                 catmap = $((; zip(keyset, trues(length(keyset)))...)),
                 legend = :none,
