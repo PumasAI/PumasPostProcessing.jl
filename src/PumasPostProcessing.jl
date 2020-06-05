@@ -1,9 +1,11 @@
 module PumasPostProcessing
 
-using Pumas, PumasPlots, Markdown
+using Pumas, PumasPlots
 using PumasPlots.StatsPlots
 
 using Pumas: FittedPumasModel, StatsBase
+
+using Serialization, Markdown
 
 include("utils.jl")
 include("reports.jl")
