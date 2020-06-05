@@ -152,11 +152,17 @@ function jmd_report(
 
     cv_keys = PumasPlots.covariate_names(fpm)
 
-    calculated_catmap = (; zip(cv_keys, PumasPlots.iscategorical.(getproperty.(Ref(df), cv_keys)))...)
-    catmap = collect(pairs(merge(calculated_catmap, catmap)))
+    if isempty(cv_keys)
+        calculated_catmap = (; zip(cv_keys, PumasPlots.iscategorical.(getproperty.(Ref(df), cv_keys)))...)
+        catmap = collect(pairs(merge(calculated_catmap, catmap)))
 
-    categorical_cvs = first.(catmap[last.(catmap)])
-    continuous_cvs  = first.(catmap[.!(last.(catmap))])
+        categorical_cvs = first.(catmap[last.(catmap)])
+        continuous_cvs  = first.(catmap[.!(last.(catmap))])
+    else
+        @info "Model had no covariates"
+        categorical_cvs = (,)
+        continuous_cvs  = (,)
+    end
 
 
     # First, we can plot a few basic things, which don't require grouping.
