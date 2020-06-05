@@ -12,6 +12,7 @@ include("reports.jl")
 include("jmd.jl")
 
 export to_report_str, report_to_md, report_to_pdf
+export jmd_report
 
 export embed, param_table, optim_meta_table, metric_table
 

@@ -10,3 +10,5 @@ deps/deps.jl
 *.png
 
 Manifest.toml
+
+report.jmd
