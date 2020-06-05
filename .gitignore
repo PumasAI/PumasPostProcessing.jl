@@ -12,3 +12,6 @@ deps/deps.jl
 Manifest.toml
 
 report.jmd
+report.html
+report.pdf
+jl_*
