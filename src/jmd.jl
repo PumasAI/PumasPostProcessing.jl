@@ -160,8 +160,8 @@ function jmd_report(
         continuous_cvs  = first.(catmap[.!(last.(catmap))])
     else
         @info "Model had no covariates"
-        categorical_cvs = (,)
-        continuous_cvs  = (,)
+        categorical_cvs = []
+        continuous_cvs  = []
     end
 
 
