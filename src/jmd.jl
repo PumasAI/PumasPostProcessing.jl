@@ -14,27 +14,6 @@ function printlnln(io::IO, args...)
     return
 end
 
-"Get the keys of the EBEs from the inference"
-function ebe_names(fpm)
-    ebes = empirical_bayes(fpm)
-    ebe_keys = keys(first(ebes))
-    ebe_types = map(typeof, first(ebes))
-
-    ret = Symbol[]
-    for k ∈ ebe_keys
-        ebe_type = ebe_types[k]
-        if ebe_type <: Number
-            push!(ret, Symbol(k))
-        elseif ebe_type <: AbstractVector
-            for j = 1:length(first(ebes)[k])
-                push!(ret, Symbol(string(k), "_$j"))
-            end
-        end
-    end
-
-    return ret
-end
-
 function jmd_report(
     fpm::Pumas.FittedPumasModel, name, number;
     fpm_path = "data/serialized/fitted_models/",
@@ -148,7 +127,7 @@ function jmd_report(
     end
 
     # To do this splitting for the EBEs, we first need their keys:
-    ebe_keys = ebe_names(fpm)
+    ebe_keys = PumasPlots.ebe_names(fpm)
 
     cv_keys = PumasPlots.covariate_names(fpm)
 
