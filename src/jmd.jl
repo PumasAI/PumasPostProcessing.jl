@@ -98,7 +98,7 @@ function jmd_report(
         printlnln(io, JLC("""
         @df fpm scatter(:$(dv), :$(dv)_ipred; xlabel = "$(dv)", ylabel = "$(dv)_ipred")
         Plots.abline!(1, 0; label = "LOI")
-        @df fpm plot!(:$(dv), :$(dv)_ipred; seriestype = :loess)
+        @df fpm plot!(:$(dv), :$(dv)_ipred; seriestype = :Loess)
         """))
         printlnln(io, "\\newpage")
 
@@ -109,7 +109,7 @@ function jmd_report(
         printlnln(io, JLC("""
         @df fpm scatter(:$(dv), :$(dv)_pred; xlabel = "$(dv)", ylabel = "$(dv)_pred")
         Plots.abline!(1, 0; label = "LOI")
-        @df fpm plot!(:$(dv), :$(dv)_pred; seriestype = :loess)
+        @df fpm plot!(:$(dv), :$(dv)_pred; seriestype = :Loess)
         """))
         printlnln(io, "\\newpage")
 
@@ -120,7 +120,7 @@ function jmd_report(
 
         printlnln(io, JLC("""
         @df fpm scatter(:tad, :$(dv)_wres; xlabel = "Time after dose", ylabel = "Weighted residuals")
-        @df fpm plot!(:tad, :$(dv)_wres; seriestype = :loess)
+        @df fpm plot!(:tad, :$(dv)_wres; seriestype = :Loess)
         Plots.hline!([0]; primary = false, linestyle = :dash, linecolor = :grey)
         """))
         printlnln(io, "\\newpage")
