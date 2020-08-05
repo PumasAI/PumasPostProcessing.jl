@@ -242,7 +242,7 @@ run(`
 `)
 
 # TODO:
-# - Deviance
+# - Log-likelihood
 # - Shrinkage
 # - Condition number
 # - Correlations
