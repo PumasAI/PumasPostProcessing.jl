@@ -92,7 +92,7 @@ Metric                                     Value
 ––––––––––––––––––––––––––––––––––– –––––––––––––––––––
 Successful minimization                    true
 Likelihood approximation                Pumas.FOCEI
-Deviance                                 14234.502
+Log-likelihood                           14234.502
 Total number of observation records        1210
 Number of actve observation records        1210
 Number of subjects                          10
@@ -104,7 +104,7 @@ Objective function value             8229.16686381138
 function optim_meta_table(fpm::Pumas.FittedPumasModel; align = [:l, :c])
     iterations, time_run, ofv = optim_meta(fpm)
     approx = typeof(fpm.approx)
-    deviance = round(Pumas.deviance(fpm); sigdigits=round(Int, -log10(Pumas.DEFAULT_ESTIMATION_RELTOL)))
+    ll = round(loglikelihood(fpm); sigdigits=round(Int, -log10(Pumas.DEFAULT_ESTIMATION_RELTOL)))
     total_records = sum((length(sub.time) for sub in fpm.data))
     active_records = sum(subject -> sum(name -> count(!ismissing, subject.observations[name]), keys(first(fpm.data).observations)), fpm.data)
 
@@ -114,7 +114,7 @@ function optim_meta_table(fpm::Pumas.FittedPumasModel; align = [:l, :c])
                 ["Metric", "Value"],
                 ["Successful minimization", Pumas.Optim.converged(fpm.optim)],
                 ["Likelihood approximation", approx],
-                ["Deviance", deviance],
+                ["Log-likelihood", ll],
                 ["Total number of observation records", total_records],
                 ["Number of actve observation records", active_records],
                 ["Number of subjects", length(fpm.data)],
@@ -150,8 +150,8 @@ function metric_table(
         formatter = x -> round(x; sigdigits = 5)
     )
 
-    esh = Pumas.ϵshrinkage(fpm.model, fpm.data, coef(fpm), fpm.approx, fpm.vvrandeffsorth)
-    nsh = Pumas.ηshrinkage(fpm.model, fpm.data, coef(fpm), fpm.approx, fpm.vvrandeffsorth)
+    esh = Pumas.ϵshrinkage(fpm)
+    nsh = Pumas.ηshrinkage(fpm)
     return Markdown.MD(
         Markdown.Table(
             [
@@ -248,7 +248,7 @@ end
 
 
 # TODO:
-# - Deviance
+# - Log-likelihood
 # - Shrinkage
 # - Condition number
 # - Correlations

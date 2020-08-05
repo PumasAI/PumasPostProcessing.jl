@@ -1,10 +1,15 @@
-using Test
+using Test, PumasPostProcessing
 
 # Include tests
 
 include("model.jl") # predefine a model
 
-@testset "Model serializability" include("serialization/model.jl")
-
-@testset "Table execution" include("reports/tables.jl")
-@testset "Weaving" include("reports/jmd.jl")
+# @testset "Model serializability" begin
+#   include("serialization/model.jl")
+# end
+@testset "Table execution" begin
+  include("reports/tables.jl")
+end
+@testset "Weaving" begin
+  include("reports/jmd.jl")
+end
